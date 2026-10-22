@@ -114,7 +114,8 @@
   $('open').href = url;
 
   if (standalone) {
-    if (mode === 'redirect' || window.APP_MODE === 'redirect') { location.replace(url); return; }
+    // เปิดระบบตรง (ฝังใน iframe แล้ว Google บล็อกบนมือถือบางรุ่น) ใช้ iframe เฉพาะ ?mode=iframe
+    if (mode !== 'iframe') { location.replace(url); return; }
     var f = $('app'); f.src = url; f.style.display = 'block';
     var ok = false; f.addEventListener('load', function () { ok = true; });
     setTimeout(function () { if (!ok) location.replace(url); }, 8000);
