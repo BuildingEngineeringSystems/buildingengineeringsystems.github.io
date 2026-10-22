@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<!-- ===================== ตั้งค่า: แก้บรรทัดนี้บรรทัดเดียว ===================== -->
+<script>
+  window.APP_URL = "https://script.google.com/macros/s/AKfycbxNtX3yfW3eGM6e2dD-LsVfRpfvDcFchDFZy0uUZKJ3RRG-E8cZEoJxBBrcceQD6vbJDA/exec";
+</script>
+<!-- ======================================================================== -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>งานระบบวิศวกรรมอาคาร</title>
+
+<!-- ไอคอนสำหรับ iPhone / iPad (สำคัญที่สุดสำหรับ iOS) -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+<!-- ไอคอนแท็บเบราว์เซอร์ และ Android -->
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+
+<!-- เปิดแบบเต็มจอเหมือนแอป เมื่อกดจากหน้าจอโฮม -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="วิศวกรรมอาคาร">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F2F2F2">
+
+<style>
+  :root { --bg:#F2F2F2; --ink:#1F2A44; --pink:#D9578A; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,"Sarabun","Noto Sans Thai",system-ui,sans-serif; }
+  #app { position:fixed; inset:0; width:100%; height:100%; border:0; display:none;
+    padding-top:env(safe-area-inset-top); box-sizing:border-box; background:#fff; }
+  #splash { position:fixed; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:14px; padding:24px; text-align:center; }
+  #splash img { width:120px; height:120px; border-radius:26px; box-shadow:0 6px 20px rgba(0,0,0,.12); }
+  #splash h1 { font-size:18px; margin:4px 0 0; }
+  #splash p { margin:0; font-size:14px; opacity:.75; }
+  .btn { display:inline-block; margin-top:8px; padding:12px 22px; border-radius:12px;
+    background:var(--ink); color:#fff; text-decoration:none; font-weight:600; }
+  #hint { display:none; max-width:320px; font-size:13px; background:#fff; padding:12px 14px;
+    border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.08); text-align:left; line-height:1.6; }
+</style>
+</head>
+<body>
+  <div id="splash">
+    <img src="apple-touch-icon.png" alt="">
+    <h1>งานระบบวิศวกรรมโครงการจ้างบริหารจัดการอาคาร</h1>
+    <p>สำนักบริหารระบบกายภาพ</p>
+    <a class="btn" id="open" href="#">เข้าสู่ระบบ</a>
+    <div id="hint">
+      <b>ติดตั้งไอคอนบน iPhone / iPad</b><br>
+      1. เปิดหน้านี้ด้วย <b>Safari</b><br>
+      2. กดปุ่ม <b>แชร์</b> (สี่เหลี่ยมมีลูกศรชี้ขึ้น)<br>
+      3. เลือก <b>เพิ่มไปยังหน้าจอโฮม</b> แล้วกด <b>เพิ่ม</b>
+    </div>
+  </div>
+  <iframe id="app" title="ระบบ" allow="camera; geolocation; clipboard-write"></iframe>
+
+<script>
+(function () {
+  // ส่งต่อพารามิเตอร์ (เช่น k = รหัสเครื่องที่ระบบใช้จำการเข้าสู่ระบบ) ไปยังระบบ
+  var qs = new URLSearchParams(location.search);
+  var fwd = new URLSearchParams();
+  qs.forEach(function (v, k) { if (k !== 'mode') fwd.set(k, v); });
+  var url = window.APP_URL + (fwd.toString() ? '?' + fwd.toString() : '');
+  var standalone = window.navigator.standalone === true ||
+                   window.matchMedia('(display-mode: standalone)').matches;
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var mode = qs.get('mode'); // ?mode=redirect ถ้าต้องการไม่ใช้ iframe
+
+  document.getElementById('open').href = url;
+
+  if (!standalone) {
+    // เปิดในเบราว์เซอร์ปกติ: แสดงหน้าทางเข้า + วิธีติดตั้งไอคอน (ยังไม่เข้าระบบอัตโนมัติ
+    // เพื่อให้ผู้ใช้กด "เพิ่มไปยังหน้าจอโฮม" ได้ทัน)
+    if (isIOS) document.getElementById('hint').style.display = 'block';
+    return;
+  }
+
+  // เปิดจากไอคอนบนหน้าจอโฮม
+  if (mode === 'redirect' || window.APP_MODE === 'redirect') {
+    location.replace(url);
+    return;
+  }
+  var f = document.getElementById('app');
+  f.src = url;
+  f.style.display = 'block';
+  // ถ้า iframe โหลดไม่ขึ้นภายใน 8 วินาที ให้เปิดลิงก์ตรงแทน
+  var ok = false;
+  f.addEventListener('load', function () { ok = true; });
+  setTimeout(function () { if (!ok) location.replace(url); }, 8000);
+})();
+</script>
+</body>
+</html>
