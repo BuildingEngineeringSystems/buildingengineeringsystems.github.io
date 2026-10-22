@@ -72,6 +72,18 @@
     <button class="btn secondary" id="copy" style="margin-top:10px">คัดลอกลิงก์</button>
   </div>
 
+  <!-- Android: แอป APK -->
+  <a class="btn primary" id="andApk" hidden href="https://github.com/BuildingEngineeringSystems/buildingengineeringsystems.github.io/releases/latest/download/engapp.apk">⬇️ ดาวน์โหลดแอป Android</a>
+  <div class="card" id="andApkSteps" hidden>
+    <b>ติดตั้งแอป</b>
+    <ol>
+      <li>กดปุ่มดาวน์โหลด แล้วแตะ <b>เปิด</b> ไฟล์ engapp.apk</li>
+      <li>ถ้าถาม ให้แตะ <b>การตั้งค่า</b> → เปิด <b>อนุญาตจากแหล่งนี้</b> → กดย้อนกลับ</li>
+      <li>แตะ <b>ติดตั้ง</b> (ถ้า Play Protect เตือน แตะ <b>รายละเอียดเพิ่มเติม → ติดตั้งต่อ</b>)</li>
+    </ol>
+    ไอคอนโลโก้ <b>วิศวกรรมอาคาร</b> จะขึ้นในหน้าจอแอป
+  </div>
+
   <!-- Android -->
   <button class="btn primary" id="andInstall" hidden>📲 ติดตั้งแอปบนหน้าจอ</button>
   <div class="card" id="andHint" hidden>
@@ -146,13 +158,14 @@
         .catch(function () { location.href = 'install.mobileconfig'; });
     });
   } else if (isAndroid) {
-    $('andHint').hidden = false;
+    $('andApk').hidden = false; $('andApkSteps').hidden = false;
   }
 
   // Android: ปุ่มติดตั้งแอปกดครั้งเดียว
   var deferred = null;
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault(); deferred = e;
+    if (isAndroid) return; // Android ใช้แอป APK แทน
     $('andInstall').hidden = false; $('andHint').hidden = true;
   });
   $('andInstall').onclick = function () {
