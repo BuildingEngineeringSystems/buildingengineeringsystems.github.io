@@ -46,15 +46,26 @@ jobs:
       - name: Prepare signing key
         env:
           KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD_SECRET: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
-          if [ -z "$KEYSTORE_B64" ]; then echo "::error::ยังไม่ได้ตั้ง secret KEYSTORE_B64"; exit 1; fi
-          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/engapp.jks"
+          # ใช้กุญแจถาวรใน Secrets ถ้าตั้งไว้ (อัปเดตทับแอปเดิมได้)
+          # ถ้าไม่ได้ตั้ง: สร้างกุญแจชั่วคราวบนเครื่อง build (เวอร์ชันใหม่ต้องลบแอปเก่าก่อนติดตั้ง)
+          if [ -n "$KEYSTORE_B64" ] && [ -n "$KEYSTORE_PASSWORD_SECRET" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/engapp.jks"
+            PW="$KEYSTORE_PASSWORD_SECRET"
+          else
+            PW="$(openssl rand -hex 16)"
+            keytool -genkeypair -keystore "$RUNNER_TEMP/engapp.jks" -storetype PKCS12 -alias engapp \
+              -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PW" -keypass "$PW" \
+              -dname "CN=Building Engineering Systems, C=TH"
+          fi
+          echo "::add-mask::$PW"
           echo "KEYSTORE_FILE=$RUNNER_TEMP/engapp.jks" >> "$GITHUB_ENV"
+          echo "KEYSTORE_PASSWORD=$PW" >> "$GITHUB_ENV"
 
       - name: Build release APK
         working-directory: android
         env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           VERSION_CODE: ${{ github.run_number }}
           VERSION_NAME: 1.0.${{ github.run_number }}
         run: gradle --no-daemon assembleRelease
