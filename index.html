@@ -126,12 +126,18 @@
 
   $('open').href = url;
 
-  if (standalone || fromIcon) {
-    // เปิดระบบตรง (ฝังใน iframe แล้ว Google บล็อกบนมือถือบางรุ่น) ใช้ iframe เฉพาะ ?mode=iframe
-    if (mode !== 'iframe') { location.replace(url); return; }
+  // เปิดระบบฝังในหน้านี้ (ไม่มีแถบเตือนของ Google) — ใส่ ?mode=redirect ถ้าต้องการเปิดลิงก์ตรง
+  var useRedirect = mode === 'redirect' || window.APP_MODE === 'redirect';
+  function openApp() {
+    if (useRedirect) { location.replace(url); return; }
     var f = $('app'); f.src = url; f.style.display = 'block';
-    var ok = false; f.addEventListener('load', function () { ok = true; });
-    setTimeout(function () { if (!ok) location.replace(url); }, 8000);
+    $('splash').style.display = 'none';
+  }
+  $('open').addEventListener('click', function (e) { e.preventDefault(); openApp(); });
+
+  // เปิดจากไอคอน / แอป / คอมพิวเตอร์: เข้าระบบทันที
+  if (standalone || fromIcon || (!isIOS && !isAndroid)) {
+    openApp();
     return;
   }
 
