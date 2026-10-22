@@ -1,0 +1,72 @@
+name: Build Android app
+
+on:
+  push:
+    branches: [main]
+    paths: ['android-src/**', '.github/workflows/android.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Assemble Android project from android-src/
+        run: |
+          P=android/app/src/main
+          mkdir -p $P/java/io/github/buildingengineeringsystems/app $P/res/xml
+          cp android-src/settings.gradle android-src/build.gradle android-src/gradle.properties android/
+          cp android-src/app.build.gradle android/app/build.gradle
+          cp android-src/AndroidManifest.xml $P/
+          cp android-src/MainActivity.java $P/java/io/github/buildingengineeringsystems/app/
+          cp android-src/file_paths.xml $P/res/xml/
+
+      - name: Make launcher icons from icon-512.png
+        run: |
+          sudo apt-get install -y -qq imagemagick >/dev/null || true
+          for d in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+            n=${d%%:*}; s=${d##*:}
+            mkdir -p android/app/src/main/res/mipmap-$n
+            convert icon-512.png -resize ${s}x${s} android/app/src/main/res/mipmap-$n/ic_launcher.png
+          done
+
+      - name: Prepare signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then echo "::error::ยังไม่ได้ตั้ง secret KEYSTORE_B64"; exit 1; fi
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/engapp.jks"
+          echo "KEYSTORE_FILE=$RUNNER_TEMP/engapp.jks" >> "$GITHUB_ENV"
+
+      - name: Build release APK
+        working-directory: android
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          VERSION_CODE: ${{ github.run_number }}
+          VERSION_NAME: 1.0.${{ github.run_number }}
+        run: gradle --no-daemon assembleRelease
+
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/release/app-release.apk engapp.apk
+
+      - name: Publish to GitHub Release (latest)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: แอป วิศวกรรมอาคาร v1.0.${{ github.run_number }}
+          body: ดาวน์โหลด engapp.apk แล้วเปิดเพื่อติดตั้งบน Android
+          make_latest: true
+          files: engapp.apk
