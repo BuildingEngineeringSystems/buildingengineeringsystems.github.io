@@ -40,7 +40,7 @@ import java.util.Locale;
 public class MainActivity extends Activity {
 
     private static final String START_URL =
-            "https://script.google.com/macros/s/AKfycbxNtX3yfW3eGM6e2dD-LsVfRpfvDcFchDFZy0uUZKJ3RRG-E8cZEoJxBBrcceQD6vbJDA/exec";
+            "https://buildingengineeringsystems.github.io/?app=1"; // หน้านี้ฝังระบบ Apps Script ไว้ (ไม่มีแถบเตือนของ Google)
     private static final int REQ_FILE = 1001;
 
     private WebView web;
