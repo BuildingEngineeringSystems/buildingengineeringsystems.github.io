@@ -90,7 +90,8 @@
 
   var qs = new URLSearchParams(location.search);
   var fwd = new URLSearchParams();
-  qs.forEach(function (v, k) { if (k !== 'mode') fwd.set(k, v); });
+  qs.forEach(function (v, k) { if (k !== 'mode' && k !== 'app') fwd.set(k, v); });
+  var fromIcon = qs.get('app') === '1'; // เปิดจากไอคอนบนหน้าจอ
   // จำรหัสเครื่อง (k) ไว้ในหน้านี้ เปิดจากไอคอนครั้งต่อไปจะเข้าระบบได้เลย
   if (KEY_RE.test(fwd.get('k') || '')) lsSet(fwd.get('k'));
   else if (KEY_RE.test(lsGet())) fwd.set('k', lsGet());
@@ -113,7 +114,7 @@
 
   $('open').href = url;
 
-  if (standalone) {
+  if (standalone || fromIcon) {
     // เปิดระบบตรง (ฝังใน iframe แล้ว Google บล็อกบนมือถือบางรุ่น) ใช้ iframe เฉพาะ ?mode=iframe
     if (mode !== 'iframe') { location.replace(url); return; }
     var f = $('app'); f.src = url; f.style.display = 'block';

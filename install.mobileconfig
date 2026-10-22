@@ -6,7 +6,7 @@
 	<array>
 		<dict>
 			<key>FullScreen</key>
-			<true/>
+			<false/>
 			<key>Icon</key>
 			<data>
 iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAQAElEQVR4Aex9B5wcxZX+
@@ -465,7 +465,7 @@ AAD//9tW164AAAAGSURBVAMAjoDJG8qMFA0AAAAASUVORK5CYII=
 			<key>Precomposed</key>
 			<true/>
 			<key>URL</key>
-			<string>https://buildingengineeringsystems.github.io/</string>
+			<string>https://buildingengineeringsystems.github.io/?app=1</string>
 		</dict>
 	</array>
 	<key>PayloadDescription</key>

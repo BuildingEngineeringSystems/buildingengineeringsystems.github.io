@@ -1,9 +1,8 @@
 {
   "name": "งานระบบวิศวกรรมโครงการจ้างบริหารจัดการอาคาร",
   "short_name": "วิศวกรรมอาคาร",
-  "start_url": "./",
-  "scope": "./",
-  "display": "standalone",
+  "start_url": "./?app=1",
+  "display": "browser",
   "background_color": "#F2F2F2",
   "theme_color": "#F2F2F2",
   "lang": "th",
