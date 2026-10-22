@@ -59,6 +59,7 @@
         <li>แตะ <b>ดาวน์โหลดโปรไฟล์แล้ว</b> (ด้านบนสุด)</li>
         <li>แตะ <b>ติดตั้ง</b> → ใส่รหัสเครื่อง → <b>ติดตั้ง</b> อีกครั้ง</li>
       </ol>
+      <small style="opacity:.75">ถ้าขึ้นถามให้ดาวน์โหลดไฟล์: แตะ <b>ดาวน์โหลด</b> → เปิดแอป <b>ไฟล์</b> → โฟลเดอร์ <b>ดาวน์โหลด</b> → แตะ <b>install.mobileconfig</b> แล้วทำตามข้อ 1–3</small><br>
       ไอคอนโลโก้จะขึ้นบนหน้าจอโฮมทันที
     </div>
   </div>
@@ -130,8 +131,17 @@
     };
   } else if (isIOS) {
     $('ios').hidden = false;
-    $('iosInstall').addEventListener('click', function () {
-      setTimeout(function () { $('iosSteps').hidden = false; }, 600);
+    // GitHub Pages ส่งไฟล์ .mobileconfig เป็นชนิดทั่วไป จึงแปลงเป็นชนิดโปรไฟล์ของ Apple ก่อนเปิด
+    $('iosInstall').addEventListener('click', function (ev) {
+      ev.preventDefault();
+      setTimeout(function () { $('iosSteps').hidden = false; }, 800);
+      fetch('install.mobileconfig', { cache: 'no-store' })
+        .then(function (r) { return r.arrayBuffer(); })
+        .then(function (buf) {
+          var blob = new Blob([buf], { type: 'application/x-apple-aspen-config' });
+          location.href = URL.createObjectURL(blob);
+        })
+        .catch(function () { location.href = 'install.mobileconfig'; });
     });
   } else if (isAndroid) {
     $('andHint').hidden = false;
