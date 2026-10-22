@@ -34,13 +34,11 @@ jobs:
           cp android-src/MainActivity.java $P/java/io/github/buildingengineeringsystems/app/
           cp android-src/file_paths.xml $P/res/xml/
 
-      - name: Make launcher icons from icon-512.png
+      - name: Add launcher icons
         run: |
-          sudo apt-get install -y -qq imagemagick >/dev/null || true
-          for d in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
-            n=${d%%:*}; s=${d##*:}
+          for n in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
             mkdir -p android/app/src/main/res/mipmap-$n
-            convert icon-512.png -resize ${s}x${s} android/app/src/main/res/mipmap-$n/ic_launcher.png
+            cp icon-192.png android/app/src/main/res/mipmap-$n/ic_launcher.png
           done
 
       - name: Prepare signing key
